@@ -209,6 +209,28 @@ function awardRoundEconomy() {
   if (winner) economy.awardRound(winner);
 }
 
+function handleRoundReset() {
+  if (!rounds.state.roundReset) return;
+  awardRoundEconomy();
+  spawnRound();
+  rounds.state.roundReset = false;
+}
+
+function handleMatchOver() {
+  if (rounds.state.matchOver && !matchEnded) {
+    matchEnded = true;
+    awardRoundEconomy();
+    hud.showOverlay(rounds.state.winner === 'player' ? 'win' : 'loss', rounds.state);
+    hud.setEconomy(economy.state.money, arsenal.state.grenades);
+    if (document.pointerLockElement) document.exitPointerLock();
+  }
+}
+
+function startNextRound() {
+  playPhaseAudio();
+  handleRoundReset();
+}
+
 function playPhaseAudio() {
   if (rounds.state.phase === lastAudioPhase) return;
   if (rounds.state.phase === 'combat') audio.roundStart();
@@ -242,14 +264,12 @@ function step(dt) {
   if (rounds.state.phase === 'roundEnd') {
     rounds.step(dt);
     effects.step(dt);
+    if (rounds.state.phase !== 'roundEnd') startNextRound();
+    handleMatchOver();
     return;
   }
 
-  if (rounds.state.roundReset) {
-    awardRoundEconomy();
-    spawnRound();
-    rounds.state.roundReset = false;
-  }
+  handleRoundReset();
 
   combatActive = rounds.state.phase === 'combat';
   if (combatActive) {
@@ -268,16 +288,7 @@ function step(dt) {
   effects.step(dt);
   playPhaseAudio();
 
-  if (rounds.state.roundReset) {
-    spawnRound();
-    rounds.state.roundReset = false;
-  }
-  if (rounds.state.matchOver && !matchEnded) {
-    matchEnded = true;
-    awardRoundEconomy();
-    hud.showOverlay(rounds.state.winner === 'player' ? 'win' : 'loss', rounds.state);
-    if (document.pointerLockElement) document.exitPointerLock();
-  }
+  handleMatchOver();
 }
 
 function updateHud() {
@@ -300,8 +311,11 @@ function updateHud() {
       hud.setBombPrompt(`Bomb detonates in ${seconds}s`);
     }
   } else if (combatActive && body.position.distanceTo(arsenal.bombZone) <= arsenal.bombZoneRadius) {
-    hud.setBombPrompt(`Hold E to plant (${bomb.progress.toFixed(1)}/3s)`);
-    lastPromptSeconds = -1;
+    const progressTick = Math.floor(bomb.progress * 10);
+    if (progressTick !== lastPromptSeconds) {
+      lastPromptSeconds = progressTick;
+      hud.setBombPrompt(`Hold E to plant (${(progressTick / 10).toFixed(1)}/3s)`);
+    }
   } else {
     hud.setBombPrompt('');
     lastPromptSeconds = -1;

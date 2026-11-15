@@ -44,7 +44,6 @@ export function createHud() {
   const scoreValue = document.getElementById('score-value');
   const healthFill = document.getElementById('health-fill');
   const healthValue = document.getElementById('health-value');
-  const money = document.getElementById('money');
   const moneyValue = document.getElementById('money-value');
   const grenadeCount = document.getElementById('grenade-count');
   const weaponName = document.getElementById('weapon-name');

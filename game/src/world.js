@@ -391,7 +391,7 @@ export function createWorld(scene) {
   const ambient = new THREE.AmbientLight(new THREE.Color(PALETTE.ink), 0.13);
   scene.add(ambient);
 
-  const sky = new THREE.HemisphereLight(new THREE.Color('#a5b0ba'), new THREE.Color('#554f43'), 0.62);
+  const sky = new THREE.HemisphereLight(new THREE.Color('#a5b0ba'), new THREE.Color('#8b8579'), 0.74);
   scene.add(sky);
 
   const key = new THREE.DirectionalLight(new THREE.Color('#fff3dd'), 3.4);
@@ -407,6 +407,11 @@ export function createWorld(scene) {
   key.shadow.bias = -0.0006;
   key.shadow.normalBias = 0.03;
   scene.add(key, key.target);
+
+  const fill = new THREE.DirectionalLight(new THREE.Color('#d8e4ef'), 1.5);
+  fill.position.set(-13, 6, 8);
+  fill.target.position.set(4, 0, -1);
+  scene.add(fill, fill.target);
 
   return {
     colliders,

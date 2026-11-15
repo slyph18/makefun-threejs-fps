@@ -28,6 +28,7 @@ export function createBuyMenu({ arsenal, economy, onClose }) {
   document.body.appendChild(menu);
 
   const itemsHost = menu.querySelector('.buy-items');
+  const closeButton = menu.querySelector('.buy-close');
   const moneyValue = document.createElement('span');
   moneyValue.className = 'buy-money-value';
   menu.querySelector('header div').appendChild(moneyValue);
@@ -86,6 +87,7 @@ export function createBuyMenu({ arsenal, economy, onClose }) {
       if (!menu.hidden) return;
       render();
       menu.hidden = false;
+      closeButton.focus();
     },
     close() {
       if (menu.hidden) return;
@@ -100,4 +102,11 @@ export function createBuyMenu({ arsenal, economy, onClose }) {
       menu.hidden = true;
     },
   };
+
+  menu.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' || event.key === 'b' || event.key === 'B') {
+      event.preventDefault();
+      close();
+    }
+  });
 }

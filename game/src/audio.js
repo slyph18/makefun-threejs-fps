@@ -2,22 +2,30 @@
 const MAX_GAIN = 0.28;
 
 export function createAudio() {
-  const context = new AudioContext();
-  const master = context.createGain();
-  master.gain.value = MAX_GAIN;
-  master.connect(context.destination);
-
-  const noiseLength = context.sampleRate * 0.4;
-  const noiseBuffer = context.createBuffer(1, noiseLength, context.sampleRate);
-  const noiseData = noiseBuffer.getChannelData(0);
-  for (let index = 0; index < noiseData.length; index += 1) {
-    noiseData[index] = Math.random() * 2 - 1;
-  }
+  let context = null;
+  let master = null;
+  let noiseBuffer = null;
 
   let bombBeepLeft = 0;
 
   function now() {
     return context.currentTime;
+  }
+
+  function ensureContext() {
+    if (!context) {
+      context = new AudioContext();
+      master = context.createGain();
+      master.gain.value = MAX_GAIN;
+      master.connect(context.destination);
+      const noiseLength = context.sampleRate * 0.4;
+      noiseBuffer = context.createBuffer(1, noiseLength, context.sampleRate);
+      const noiseData = noiseBuffer.getChannelData(0);
+      for (let index = 0; index < noiseData.length; index += 1) {
+        noiseData[index] = Math.random() * 2 - 1;
+      }
+    }
+    return context;
   }
 
   function exponentialDecay(node, end, duration) {
@@ -26,6 +34,7 @@ export function createAudio() {
   }
 
   function playNoise({ duration, gain, frequency, quality = 2 }) {
+    if (context?.state !== 'running') return;
     const source = context.createBufferSource();
     const filter = context.createBiquadFilter();
     const output = context.createGain();
@@ -39,9 +48,15 @@ export function createAudio() {
     source.start();
     exponentialDecay(output, 0.001, duration);
     source.stop(now() + duration);
+    source.onended = () => {
+      source.disconnect();
+      filter.disconnect();
+      output.disconnect();
+    };
   }
 
   function playTone({ type = 'sine', start, end, duration, gain, delay = 0 }) {
+    if (context?.state !== 'running') return;
     const oscillator = context.createOscillator();
     const output = context.createGain();
     const startTime = now() + delay;
@@ -53,11 +68,16 @@ export function createAudio() {
     oscillator.connect(output).connect(master);
     oscillator.start(startTime);
     oscillator.stop(startTime + duration);
+    oscillator.onended = () => {
+      oscillator.disconnect();
+      output.disconnect();
+    };
   }
 
   return {
     unlock() {
-      if (context.state !== 'running') context.resume();
+      const audioContext = ensureContext();
+      if (audioContext.state !== 'running') audioContext.resume();
     },
     gunshot(distance = 0) {
       const falloff = 1 / (1 + distance * 0.075);

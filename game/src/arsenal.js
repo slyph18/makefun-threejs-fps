@@ -134,7 +134,7 @@ export function createArsenal(scene) {
   }
 
   function buyGrenade() {
-    state.grenades += 1;
+    state.grenades = Math.min(MAX_GRENADES, state.grenades + 1);
   }
 
   function beginRound() {
@@ -164,7 +164,9 @@ export function createArsenal(scene) {
 
   function throwGrenade(origin, direction) {
     if (state.grenades <= 0 || state.grenadeCooldown > 0) return false;
-    const grenade = grenades[GRENADES_PER_ROUND - state.grenades - 1];
+    const grenade = grenades[0].mesh.visible || grenades[0].exploded
+      ? grenades[1]
+      : grenades[0];
     grenade.mesh.visible = true;
     grenade.mesh.position.copy(origin);
     grenade.velocity.copy(direction).multiplyScalar(GRENADE_THROW_SPEED);
