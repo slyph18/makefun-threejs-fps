@@ -14,6 +14,7 @@ import { createBots } from './bots.js';
 import { createRounds } from './rounds.js';
 import { createHud } from './hud.js';
 import { createEffects } from './effects.js';
+import { createAudio } from './audio.js';
 
 const FIXED_STEP = 1 / 60;
 const params = new URLSearchParams(window.location.search);
@@ -37,11 +38,13 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.08;
 document.getElementById('game').appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(PALETTE.canvas);
-scene.fog = new THREE.Fog(new THREE.Color(PALETTE.canvas), 42, 125);
+scene.background = new THREE.Color(PALETTE.sky);
+scene.fog = new THREE.Fog(new THREE.Color(PALETTE.sky), 34, 96);
 const camera = new THREE.PerspectiveCamera(74, window.innerWidth / window.innerHeight, 0.05, 140);
 scene.add(camera);
 
@@ -53,7 +56,8 @@ const arsenal = createArsenal(scene);
 const economy = createEconomy();
 const rounds = createRounds();
 const hud = createHud();
-const weapon = createWeapon(camera, arsenal);
+const audio = createAudio();
+const weapon = createWeapon(camera, arsenal, player);
 const buy = createBuyMenu({
   arsenal,
   economy,
@@ -80,6 +84,7 @@ let combatActive = false;
 let frozen = false;
 let started = false;
 let matchEnded = false;
+let lastAudioPhase = '';
 let accumulator = 0;
 let lastTime = performance.now();
 
@@ -89,6 +94,7 @@ hud.setEconomy(economy.state.money, arsenal.state.grenades);
 hud.showOverlay('start', rounds.state);
 hud.onPlay(() => {
   if (shot) return;
+  audio.unlock();
   if (rounds.state.matchOver) restart();
   input.requestLock();
 });
@@ -119,12 +125,14 @@ function spawnRound() {
   hud.setLoadout(arsenal.current().name, arsenal.state.armor);
   hud.setHealth(body.health);
   hud.setMatch(rounds.state.round, rounds.state.playerWins, rounds.state.botWins, rounds.state.phase, 0);
+  hud.setRoundOutcome(rounds.state.lastRoundWinner, rounds.state.phase);
 }
 
 function onLockChange(locked) {
   if (shot) return;
   if (locked) {
     started = true;
+    audio.unlock();
     hud.hideOverlay();
   } else if (buy.isOpen()) {
     buy.open();
@@ -152,7 +160,7 @@ function shoot(spread) {
   const hit = raycaster.intersectObjects(shootables, false)[0];
   shotEndpoint.copy(camera.position).addScaledVector(direction, hit ? hit.distance : 44);
   playerMuzzle.set(0.24, -0.18, -0.95).applyMatrix4(camera.matrixWorld);
-  effects.addTracer(playerMuzzle, shotEndpoint, 'ink');
+  effects.addTracer(playerMuzzle, shotEndpoint, 'tracer');
   if (hit && hit.object.userData.bot) {
     incomingDirection.copy(direction).negate();
     const killed = bots.damage(
@@ -161,26 +169,34 @@ function shoot(spread) {
       incomingDirection.x,
       incomingDirection.z,
       world.cover,
+      body,
+      world.shootables,
     );
     hud.hitMarker(killed, markerHoldMs);
     if (killed) {
       economy.addKillReward();
+      hud.killConfirmed(economy.killReward());
       hud.setEconomy(economy.state.money, arsenal.state.grenades);
     }
   }
   weapon.pullTrigger();
   player.recoil(0.009 + random() * 0.004, (random() * 2 - 1) * 0.004);
   hud.setAmmo(arsenal.currentAmmo().mag, arsenal.currentAmmo().reserve);
+  audio.gunshot();
   return true;
 }
 
-function damagePlayer(amount) {
+function damagePlayer(amount, shooterX = 0, shooterZ = 0) {
   player.damage(arsenal.state.armor ? Math.ceil(amount / 2) : amount);
+  const directionX = shooterX - body.position.x;
+  const directionZ = shooterZ - body.position.z;
+  hud.damageIndicator(Math.atan2(directionX, -directionZ));
   hud.setHealth(body.health);
 }
 
 function onGrenadeKill() {
   economy.addKillReward();
+  hud.killConfirmed(economy.killReward());
   hud.setEconomy(economy.state.money, arsenal.state.grenades);
 }
 
@@ -191,6 +207,13 @@ function keyWasPressed(code) {
 function awardRoundEconomy() {
   const winner = rounds.state.lastRoundWinner;
   if (winner) economy.awardRound(winner);
+}
+
+function playPhaseAudio() {
+  if (rounds.state.phase === lastAudioPhase) return;
+  if (rounds.state.phase === 'combat') audio.roundStart();
+  else if (rounds.state.phase === 'roundEnd') audio.roundEnd(rounds.state.lastRoundWinner);
+  lastAudioPhase = rounds.state.phase;
 }
 
 function handleControls() {
@@ -216,6 +239,12 @@ function handleControls() {
 }
 
 function step(dt) {
+  if (rounds.state.phase === 'roundEnd') {
+    rounds.step(dt);
+    effects.step(dt);
+    return;
+  }
+
   if (rounds.state.roundReset) {
     awardRoundEconomy();
     spawnRound();
@@ -228,14 +257,16 @@ function step(dt) {
   } else {
     body.velocity.set(0, 0, 0);
   }
-  weapon.step(dt);
-  bots.step(dt, body, world.shootables, combatActive, damagePlayer, world.cover, effects);
+  weapon.step(dt, player.groundSpeed());
+  bots.step(dt, body, world.shootables, combatActive, damagePlayer, world.cover, effects, rounds.pressure(), audio);
   if (combatActive) {
     arsenal.updateGrenades(dt, bots.items, onGrenadeKill);
     arsenal.updateBomb(dt, body.position, input.state.keys.has('KeyE'));
+    if (arsenal.state.bomb.planted) audio.bombTick(dt, arsenal.state.bomb.fuse);
   }
   rounds.step(dt, body.health > 0, bots.remaining(), arsenal.state.bomb.outcome, arsenal.state.bomb.planted);
   effects.step(dt);
+  playPhaseAudio();
 
   if (rounds.state.roundReset) {
     spawnRound();
@@ -260,6 +291,7 @@ function updateHud() {
     Math.ceil(rounds.remainingTime()),
   );
   hud.setLoadout(arsenal.current().name, arsenal.state.armor);
+  hud.setRoundOutcome(rounds.state.lastRoundWinner, rounds.state.phase);
   const bomb = arsenal.state.bomb;
   if (bomb.planted) {
     const seconds = Math.ceil(bomb.fuse);
@@ -287,7 +319,7 @@ function frame(now) {
     if (input.state.firing && combatActive && weapon.ready()) {
       shoot(weapon.spread(player.groundSpeed()));
     }
-    if (input.state.keys.has('KeyR') && combatActive) weapon.reload();
+    if (input.state.keys.has('KeyR') && combatActive && keyWasPressed('KeyR') && weapon.reload()) audio.reload();
     accumulator += dt;
     let steps = 0;
     while (accumulator >= FIXED_STEP && steps < 5) {

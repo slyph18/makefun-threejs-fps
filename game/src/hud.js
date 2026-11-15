@@ -51,7 +51,12 @@ export function createHud() {
   const armorStatus = document.getElementById('armor-status');
   const bombPrompt = document.getElementById('bomb-prompt');
   const hitmarker = document.getElementById('hitmarker');
+  const damageIndicator = document.getElementById('damage-indicator');
+  const killToast = document.getElementById('kill-toast');
+  const roundOutcome = document.getElementById('round-outcome');
   let hitTimer = 0;
+  let damageTimer = 0;
+  let killTimer = 0;
   let lastMag = -1;
   let lastReserve = -1;
   let lastRound = -1;
@@ -121,6 +126,26 @@ export function createHud() {
         hitmarker.classList.remove('on');
         hitmarker.style.transform = '';
       }, holdMs);
+    },
+    damageIndicator(screenAngle) {
+      damageIndicator.style.transform = `translate(-50%, -50%) rotate(${screenAngle.toFixed(1)}rad)`;
+      damageIndicator.classList.add('on');
+      clearTimeout(damageTimer);
+      damageTimer = setTimeout(() => damageIndicator.classList.remove('on'), 420);
+    },
+    killConfirmed(reward) {
+      killToast.textContent = `Kill confirmed +$${reward}`;
+      killToast.classList.add('on');
+      clearTimeout(killTimer);
+      killTimer = setTimeout(() => killToast.classList.remove('on'), 900);
+    },
+    setRoundOutcome(winner, phase) {
+      if (phase === 'roundEnd') {
+        roundOutcome.textContent = winner === 'player' ? 'Round Won' : 'Round Lost';
+        roundOutcome.classList.add('on', winner === 'player' ? 'player' : 'bots');
+      } else {
+        roundOutcome.classList.remove('on', 'player', 'bots');
+      }
     },
     showOverlay(mode, matchState) {
       const text = COPY[mode];

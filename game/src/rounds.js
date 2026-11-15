@@ -2,7 +2,7 @@
 // main.js owns spawning; rounds.js only advances state and reports when a round resets.
 const BUY_TIME = 8;
 const COMBAT_TIME = 90;
-const ROUND_END_TIME = 1.6;
+const ROUND_END_TIME = 1;
 const WIN_TARGET = 3;
 
 export function createRounds() {
@@ -79,6 +79,10 @@ export function createRounds() {
       if (state.phase === 'buy') return Math.max(0, BUY_TIME - state.phaseTime);
       if (state.phase === 'combat') return Math.max(0, COMBAT_TIME - state.phaseTime);
       return Math.max(0, ROUND_END_TIME - state.phaseTime);
+    },
+    pressure() {
+      if (state.phase !== 'combat') return 0;
+      return Math.min(1, state.phaseTime / COMBAT_TIME);
     },
   };
 }

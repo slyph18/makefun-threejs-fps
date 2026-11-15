@@ -5,8 +5,8 @@ import { PALETTE } from './palette.js';
 
 const TRACER_COUNT = 24;
 const PUFF_COUNT = 20;
-const TRACER_TIME = 0.06;
-const PUFF_TIME = 0.22;
+const TRACER_TIME = 0.08;
+const PUFF_TIME = 0.26;
 
 export function createEffects(scene) {
   const tracerGeometry = new THREE.BoxGeometry(1, 1, 1);
@@ -15,6 +15,7 @@ export function createEffects(scene) {
     const mesh = new THREE.Mesh(
       tracerGeometry,
       new THREE.MeshBasicMaterial({
+        color: new THREE.Color(PALETTE.tracer),
         transparent: true,
         opacity: 0.95,
         depthWrite: false,
@@ -55,8 +56,8 @@ export function createEffects(scene) {
     tracerMidpoint.addVectors(origin, target).multiplyScalar(0.5);
     tracer.mesh.position.copy(tracerMidpoint);
     tracer.mesh.lookAt(target);
-    tracer.mesh.scale.set(0.02, 0.02, origin.distanceTo(target) || 0.001);
-    tracer.mesh.material.color.set(PALETTE[colorName]);
+    tracer.mesh.scale.set(0.013, 0.013, origin.distanceTo(target) || 0.001);
+    tracer.mesh.material.color.set(PALETTE.tracer);
     tracer.mesh.material.opacity = 0.95;
     tracer.mesh.visible = true;
     tracer.life = TRACER_TIME;
@@ -67,8 +68,8 @@ export function createEffects(scene) {
     puffCursor = (puffCursor + 1) % PUFF_COUNT;
     puff.mesh.position.copy(position);
     puff.mesh.visible = true;
-    puff.mesh.scale.setScalar(0.4);
-    puff.mesh.material.opacity = 0.72;
+    puff.mesh.scale.setScalar(0.24);
+    puff.mesh.material.opacity = 0.62;
     puff.life = PUFF_TIME;
   }
 
@@ -83,8 +84,8 @@ export function createEffects(scene) {
       if (puff.life <= 0) continue;
       puff.life -= dt;
       const blend = 1 - Math.max(0, puff.life / PUFF_TIME);
-      puff.mesh.scale.setScalar(0.4 + blend * 1.5);
-      puff.mesh.material.opacity = 0.72 * (1 - blend);
+      puff.mesh.scale.setScalar(0.24 + blend * 0.86);
+      puff.mesh.material.opacity = 0.62 * (1 - blend);
       if (puff.life <= 0) puff.mesh.visible = false;
     }
   }

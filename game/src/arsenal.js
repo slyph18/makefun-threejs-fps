@@ -82,7 +82,7 @@ export function createArsenal(scene) {
     metalness: 0.25,
   });
   const explosionMaterial = new THREE.MeshBasicMaterial({
-    color: new THREE.Color(PALETTE.accent),
+    color: new THREE.Color(PALETTE.muted),
     transparent: true,
     opacity: 0.9,
     depthWrite: false,

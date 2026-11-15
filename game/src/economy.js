@@ -39,6 +39,9 @@ export function createEconomy() {
     addKillReward() {
       addMoney(KILL_REWARD);
     },
+    killReward() {
+      return KILL_REWARD;
+    },
     resetMatch() {
       state.money = START_MONEY;
       state.lossStreak = 0;
