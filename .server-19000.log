@@ -1,0 +1,55 @@
+Serving HTTP on 0.0.0.0 port 19000 (http://0.0.0.0:19000/) ...
+127.0.0.1 - - [16/Nov/2026 03:39:27] "GET /game/?shot=start&seed=7 HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:39:27] "GET /game/src/main.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:39:27] "GET /game/vendor/three/three.module.min.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:39:27] "GET /game/src/palette.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:39:27] "GET /game/src/world.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:39:27] "GET /game/src/input.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:39:27] "GET /game/src/player.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:39:27] "GET /game/src/weapon.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:39:27] "GET /game/src/arsenal.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:39:27] "GET /game/src/economy.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:39:27] "GET /game/src/buy.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:39:27] "GET /game/src/bots.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:39:27] "GET /game/src/rounds.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:39:27] "GET /game/src/hud.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:39:27] "GET /game/src/effects.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:39:27] "GET /game/vendor/three/three.core.min.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:39:27] code 404, message File not found
+127.0.0.1 - - [16/Nov/2026 03:39:27] "GET /favicon.ico HTTP/1.1" 404 -
+127.0.0.1 - - [16/Nov/2026 03:39:53] "GET /game/?shot=play&seed=7 HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:39:53] "GET /game/src/main.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:39:53] "GET /game/vendor/three/three.module.min.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:39:53] "GET /game/src/palette.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:39:53] "GET /game/src/world.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:39:53] "GET /game/src/input.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:39:53] "GET /game/src/weapon.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:39:53] "GET /game/src/player.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:39:53] "GET /game/src/arsenal.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:39:53] "GET /game/src/economy.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:39:53] "GET /game/src/buy.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:39:53] "GET /game/src/bots.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:39:53] "GET /game/src/rounds.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:39:53] "GET /game/src/hud.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:39:53] "GET /game/src/effects.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:39:53] "GET /game/vendor/three/three.core.min.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:39:55] code 404, message File not found
+127.0.0.1 - - [16/Nov/2026 03:39:55] "GET /favicon.ico HTTP/1.1" 404 -
+127.0.0.1 - - [16/Nov/2026 03:40:30] "GET /game/?shot=end&seed=7 HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:40:30] "GET /game/src/main.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:40:31] "GET /game/vendor/three/three.module.min.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:40:31] "GET /game/src/palette.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:40:31] "GET /game/src/world.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:40:31] "GET /game/src/player.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:40:31] "GET /game/src/weapon.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:40:31] "GET /game/src/input.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:40:31] "GET /game/src/bots.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:40:31] "GET /game/src/rounds.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:40:31] "GET /game/src/arsenal.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:40:31] "GET /game/src/buy.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:40:31] "GET /game/src/economy.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:40:31] "GET /game/src/hud.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:40:31] "GET /game/src/effects.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:40:31] "GET /game/vendor/three/three.core.min.js HTTP/1.1" 200 -
+127.0.0.1 - - [16/Nov/2026 03:40:32] code 404, message File not found
+127.0.0.1 - - [16/Nov/2026 03:40:32] "GET /favicon.ico HTTP/1.1" 404 -
